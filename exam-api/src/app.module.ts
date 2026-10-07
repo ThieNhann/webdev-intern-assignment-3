@@ -12,17 +12,15 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'mysecretpassword',
-      database: 'gscores',
-      entities: [ExamResult],
-      synchronize: true, // For development only
+      host: process.env.DB_HOST || 'localhost', // Đọc 'postgres' khi chạy Docker, 'localhost' khi chạy ngoài
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'mysecretpassword',
+      database: process.env.DB_NAME || 'gscores',
+      autoLoadEntities: true,
+      synchronize: true,
     }),
     ExamResultsModule,
-    // Distributed tracing, auto-correlated logs, request/job metrics, error
-    // telemetry, alarms, and more — out of the box. Sign up at https://observe.nestjs.com
     ObserveModule.forRoot({
       appKey: 'YOUR_APP_KEY',
       appSecret: 'YOUR_APP_SECRET',
