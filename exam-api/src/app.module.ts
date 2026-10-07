@@ -19,6 +19,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       database: process.env.DB_NAME || 'gscores',
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
     ExamResultsModule,
     ObserveModule.forRoot({
