@@ -10,6 +10,9 @@ export class ExamResultsService {
     private examResultRepository: Repository<ExamResult>,
   ) { }
 
+  private cachedStatistics: any = null;
+  private cachedTopGroupA: any = null;
+
   async getScore(registrationNumber: string): Promise<ExamResult> {
     const result = await this.examResultRepository.findOne({
       where: { registration_number: registrationNumber },
@@ -21,7 +24,9 @@ export class ExamResultsService {
   }
 
   async getTopGroupA(): Promise<any[]> {
-    return this.examResultRepository
+    if (this.cachedTopGroupA) return this.cachedTopGroupA;
+
+    const result = await this.examResultRepository
       .createQueryBuilder('exam_result')
       .select(['registration_number', 'math', 'physics', 'chemistry'])
       .addSelect('(math + physics + chemistry)', 'total')
@@ -31,9 +36,12 @@ export class ExamResultsService {
       .orderBy('total', 'DESC')
       .limit(10)
       .getRawMany();
+    this.cachedTopGroupA = result;
+    return result;
   }
 
   async getStatistics(): Promise<any> {
+    if (this.cachedStatistics) return this.cachedStatistics;
     const subjects = [
       'math',
       'literature',
@@ -83,6 +91,7 @@ export class ExamResultsService {
         };
       });
 
+      this.cachedStatistics = formattedResult;
       return formattedResult;
     } catch (e: any) {
       return { error: e.message, stack: e.stack };
