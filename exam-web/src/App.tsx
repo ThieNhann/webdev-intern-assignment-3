@@ -69,6 +69,7 @@ function App() {
               <h3 className="card-title">Hello!</h3>
             </div>
             <p style={{ color: 'var(--text-secondary)' }}>
+              No dashboard specification required.
               Cold starting the web app might take some time &#40;20s - 30s&#41;. Please be patient :&#41;.
             </p>
           </div>
