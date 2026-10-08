@@ -163,7 +163,8 @@ webdev-intern-assignment-3/
 │           │   └── exam-result.entity.ts  # Exam results entity & schema definition
 │           └── services/
 │               ├── csv-parser.service.ts  # Stream & chunked batch insertion service
-│               └── exam-results.service.ts# Business logic for lookups, analytics & Top Group A
+│               ├── exam-results.service.ts# Business logic for lookups, analytics & Top Group A
+│               └── subject.manager.ts     # OOP implementation for managing subject statistics
 └── exam-web/                       # Frontend application (React + Vite + TypeScript)
     ├── Dockerfile
     ├── index.html

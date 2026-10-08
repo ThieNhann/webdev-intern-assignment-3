@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ExamResult } from '../entities/exam-result.entity.js';
+import { SubjectManager } from './subject.manager.js';
 
 @Injectable()
 export class ExamResultsService {
@@ -42,39 +43,19 @@ export class ExamResultsService {
 
   async getStatistics(): Promise<any> {
     if (this.cachedStatistics) return this.cachedStatistics;
-    const subjects = [
-      'math',
-      'literature',
-      'foreign_language',
-      'physics',
-      'chemistry',
-      'biology',
-      'history',
-      'geography',
-      'civic_education',
-    ];
+    
+    const subjectManager = new SubjectManager();
+    const subjects = subjectManager.getAllSubjects();
 
     const query = this.examResultRepository.createQueryBuilder('exam_result');
 
     query.select('1', 'dummy');
 
     subjects.forEach((subject) => {
-      query.addSelect(
-        `SUM(CASE WHEN ${subject} >= 8 THEN 1 ELSE 0 END)`,
-        `${subject}_level_1`
-      );
-      query.addSelect(
-        `SUM(CASE WHEN ${subject} >= 6 AND ${subject} < 8 THEN 1 ELSE 0 END)`,
-        `${subject}_level_2`
-      );
-      query.addSelect(
-        `SUM(CASE WHEN ${subject} >= 4 AND ${subject} < 6 THEN 1 ELSE 0 END)`,
-        `${subject}_level_3`
-      );
-      query.addSelect(
-        `SUM(CASE WHEN ${subject} < 4 THEN 1 ELSE 0 END)`,
-        `${subject}_level_4`
-      );
+      const selectQueries = subject.getSelectQueries();
+      selectQueries.forEach(({ query: sql, alias }) => {
+        query.addSelect(sql, alias);
+      });
     });
 
     try {
@@ -83,11 +64,11 @@ export class ExamResultsService {
       // Format the response
       const formattedResult: any = {};
       subjects.forEach(subject => {
-        formattedResult[subject] = {
-          '>=8': parseInt(result[`${subject}_level_1`], 10) || 0,
-          '6-8': parseInt(result[`${subject}_level_2`], 10) || 0,
-          '4-6': parseInt(result[`${subject}_level_3`], 10) || 0,
-          '<4': parseInt(result[`${subject}_level_4`], 10) || 0,
+        formattedResult[subject.name] = {
+          '>=8': parseInt(result[`${subject.name}_level_1`], 10) || 0,
+          '6-8': parseInt(result[`${subject.name}_level_2`], 10) || 0,
+          '4-6': parseInt(result[`${subject.name}_level_3`], 10) || 0,
+          '<4': parseInt(result[`${subject.name}_level_4`], 10) || 0,
         };
       });
 
