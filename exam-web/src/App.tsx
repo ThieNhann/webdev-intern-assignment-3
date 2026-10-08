@@ -69,7 +69,7 @@ function App() {
               <h3 className="card-title">Hello!</h3>
             </div>
             <p style={{ color: 'var(--text-secondary)' }}>
-              Cold starting the web app might take some time &#91;20s - 30s&#93;. Please be patient :&#93.
+              Cold starting the web app might take some time &lpar;20s - 30s&rpar;. Please be patient :&lpar;.
             </p>
           </div>
         );
